@@ -1,11 +1,11 @@
 module risevest
 
-
 // +heroku goVersion go1.16
 go 1.16
 
 require (
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d // indirect
+	github.com/aws/aws-sdk-go v1.42.52 // indirect
 	github.com/gofiber/fiber/v2 v2.26.0 // indirect
 	github.com/golang-jwt/jwt/v4 v4.3.0 // indirect
 	github.com/google/uuid v1.3.0 // indirect
