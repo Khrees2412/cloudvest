@@ -3,7 +3,7 @@ package database
 import (
 	"os"
 
-	"everest/models"
+	"risevest/models"
 
 	log "github.com/sirupsen/logrus"
 	"gorm.io/driver/postgres"
