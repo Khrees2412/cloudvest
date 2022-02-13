@@ -15,6 +15,9 @@ import (
 
 func init() {
 
+	// set up logger
+	logger.SetupLogger()
+
 	// loads values from .env into the system
 	if err := godotenv.Load(); err != nil {
 		log.Println("No .env file found")
@@ -24,9 +27,6 @@ func init() {
 
 func main() {
 	app := fiber.New()
-
-	// set up logger
-	logger.SetupLogger()
 
 	//Connect Database
 	database.Connect()

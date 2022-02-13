@@ -15,20 +15,6 @@ type User struct {
 	Password string `json:"-"`
 }
 
-type Folder struct {
-	Base
-	name    string
-	User_id string
-}
-
-type File struct {
-	Base
-	name        string
-	User_id     string
-	url         string
-	folder_name string
-}
-
 // UserErrors represent the error format for user routes
 type UserErrors struct {
 	Err      bool   `json:"error"`
