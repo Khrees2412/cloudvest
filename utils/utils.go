@@ -119,10 +119,6 @@ func SecureAuth() func(*fiber.Ctx) error {
 	}
 }
 
-// privUser := USER.Group("/private")
-// privUser.Use(util.SecureAuth()) // middleware to secure all routes for this group
-// privUser.Get("/user", GetUserData)
-
 // GetAuthCookies sends two cookies of type access_token and refresh_token
 func GetAuthCookies(accessToken, refreshToken string) (*fiber.Cookie, *fiber.Cookie) {
 	accessCookie := &fiber.Cookie{

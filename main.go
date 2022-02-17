@@ -1,6 +1,7 @@
 package main
 
 import (
+	// "risevest/database"
 	"risevest/database"
 	"risevest/logger"
 	"risevest/routes"
@@ -19,14 +20,20 @@ func init() {
 	logger.SetupLogger()
 
 	// loads values from .env into the system
-	if err := godotenv.Load(); err != nil {
-		log.Println("No .env file found")
-	}
-	log.Println("Environment variables successfully loaded. Starting application...")
+	// if err := godotenv.Load(); err != nil {
+	// 	log.Fatalln("No .env file found")
+	// }
+	// log.Println("Environment variables successfully loaded. Starting application...")
 }
 
 func main() {
 	app := fiber.New()
+
+	err := godotenv.Load(".env")
+
+	if err != nil {
+		log.Fatalf("Error loading .env file")
+	}
 
 	//Connect Database
 	database.Connect()
