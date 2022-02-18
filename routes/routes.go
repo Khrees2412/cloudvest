@@ -14,18 +14,19 @@ func Setup(app *fiber.App) {
 	api := app.Group("/api/v1")
 	// Authentication end points
 	_auth := api.Group("/auth")
+	private := api.Group("/upload")
 	_auth.Post("/login", auth.Login)
 	_auth.Post("/register", auth.Register)
 
-	// api.Use(utils.SecureAuth())
+	private.Use(utils.SecureAuth())
 
-	api.Post("/folder", utils.SecureAuth(), controllers.CreateFolder)
+	private.Post("/folder", controllers.CreateFolder)
 
-	api.Post("/folder/:folder/file", utils.SecureAuth(), controllers.StoreFileInFolder)
+	private.Post("/folder/:folder/file", controllers.StoreFileInFolder)
 
-	api.Post("/file", utils.SecureAuth(), controllers.StoreFile)
-	api.Get("/files", utils.SecureAuth(), controllers.GetFiles)
-	api.Get("/file/:fileID", utils.SecureAuth(), controllers.GetFile)
-	api.Delete("/file/:fileID", utils.SecureAuth(), controllers.DeleteFile)
+	private.Post("/file", controllers.StoreFile)
+	private.Get("/files", controllers.GetFiles)
+	private.Get("/file/:fileID", controllers.GetFile)
+	private.Delete("/file/:fileID", controllers.DeleteFile)
 
 }

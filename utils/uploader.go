@@ -23,9 +23,8 @@ var sess = connectAWS()
 func connectAWS() *session.Session {
 	sess, err := session.NewSession(
 		&aws.Config{
-			Region: aws.String("eu-west-2"),
-			// Credentials: credentials.NewStaticCredentials(AWS_ACCESS_KEY, AWS_SECRET_KEY, ""),
-			Credentials: credentials.NewStaticCredentials("AKIASNAKIURHEPTI75HW", "nsgs9lDx4xzUAPOSb0Z2/eFz8nVtINhkDpSiTyJt", ""),
+			Region:      aws.String("eu-west-2"),
+			Credentials: credentials.NewStaticCredentials(AWS_ACCESS_KEY, AWS_SECRET_KEY, ""),
 		})
 	if err != nil {
 		panic(err)

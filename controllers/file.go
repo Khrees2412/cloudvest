@@ -130,32 +130,46 @@ func GetFiles(c *fiber.Ctx) error {
 	user_id := fmt.Sprintf("%s", c.Locals("id"))
 	user := &models.User{}
 
-	db.DB.Where("uuid = ?", user_id).Find(&user.Files)
-	if len(user.Files) < 1 {
+	db.DB.Where("uuid = ?", user_id).Find(&user.File)
+	if len(user.File) < 1 {
 		return c.JSON(fiber.Map{
 			"message": "No files found for user",
 		})
 	}
 	return c.JSON(fiber.Map{
 		"message": "Successfully retrieved files",
-		"files":   user.Files,
+		"files":   user.File,
 	})
 
 }
 
 func GetFile(c *fiber.Ctx) error {
 	file_name := fmt.Sprintf("%s", c.Locals("filename"))
-	return c.JSON(file_name)
+	user_id := fmt.Sprintf("%s", c.Locals("id"))
+
+	file := &models.File{}
+	db.DB.Where("uuid = ? AND name = ?", user_id, file_name).Find(&file)
+	return c.JSON(fiber.Map{
+		"success": true,
+		"message": "File found",
+		"file":    file,
+	})
 
 }
 
 func DeleteFile(c *fiber.Ctx) error {
 	file_name := fmt.Sprintf("%s", c.Locals("filename"))
-	return c.JSON(file_name)
+	user_id := fmt.Sprintf("%s", c.Locals("id"))
+
+	file := &models.File{}
+	db.DB.Where("uuid = ? AND name = ?", user_id, file_name).Delete(&file)
+	return c.JSON(fiber.Map{
+		"message": fmt.Sprintf("Delete %s successfully", file_name),
+	})
 
 }
 
 func DownloadFile(c *fiber.Ctx) error {
-	file := c.Params("")
+	file := c.Params("file")
 	return c.JSON(file)
 }

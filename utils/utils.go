@@ -22,7 +22,7 @@ func GenerateTokens(uuid string) (string, string) {
 	return accessToken, refreshToken
 }
 
-// GenerateAccessClaims returns a claim and a acess_token string
+// GenerateAccessClaims returns a claim and an access_token string
 func GenerateAccessClaims(uuid string) (*models.Claims, string) {
 	t := time.Now()
 	claim := &models.Claims{
@@ -86,7 +86,6 @@ func SecureAuth() func(*fiber.Ctx) error {
 	return func(c *fiber.Ctx) error {
 		accessToken := c.Cookies("access_token")
 		claims := new(models.Claims)
-
 		token, err := jwt.ParseWithClaims(accessToken, claims,
 			func(token *jwt.Token) (interface{}, error) {
 				return jwtKey, nil
@@ -99,6 +98,7 @@ func SecureAuth() func(*fiber.Ctx) error {
 					"general": "Token Expired",
 				})
 			}
+
 		} else if ve, ok := err.(*jwt.ValidationError); ok {
 			if ve.Errors&jwt.ValidationErrorMalformed != 0 {
 				// this is not even a token, we should delete the cookies here
@@ -126,7 +126,7 @@ func GetAuthCookies(accessToken, refreshToken string) (*fiber.Cookie, *fiber.Coo
 		Value:    accessToken,
 		Expires:  time.Now().Add(24 * time.Hour),
 		HTTPOnly: true,
-		Secure:   true,
+		// Secure:   true,
 	}
 
 	refreshCookie := &fiber.Cookie{
@@ -134,7 +134,7 @@ func GetAuthCookies(accessToken, refreshToken string) (*fiber.Cookie, *fiber.Coo
 		Value:    refreshToken,
 		Expires:  time.Now().Add(10 * 24 * time.Hour),
 		HTTPOnly: true,
-		Secure:   true,
+		// Secure:   true,
 	}
 
 	return accessCookie, refreshCookie

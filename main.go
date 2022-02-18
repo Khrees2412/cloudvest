@@ -18,22 +18,27 @@ func init() {
 
 	// set up logger
 	logger.SetupLogger()
+	var envs map[string]string
+	envs, err := godotenv.Read(".env")
 
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
+	name := envs["AWS_BUCKET"]
+	editor := envs["AWS_ACCESS_KEY"]
+
+	log.Println("Environment variables ", name, editor)
+	// log.Println(os.Environ())
 	// loads values from .env into the system
-	// if err := godotenv.Load(); err != nil {
-	// 	log.Fatalln("No .env file found")
-	// }
-	// log.Println("Environment variables successfully loaded. Starting application...")
+	if err := godotenv.Load(); err != nil {
+		log.Fatalln("No .env file found")
+	}
+	log.Println("Environment variables successfully loaded. Starting application...")
 }
 
 func main() {
 	app := fiber.New()
-
-	err := godotenv.Load(".env")
-
-	if err != nil {
-		log.Fatalf("Error loading .env file")
-	}
 
 	//Connect Database
 	database.Connect()
@@ -57,7 +62,7 @@ func main() {
 	port := os.Getenv("PORT")
 
 	// Verify if heroku provided the port or not
-	if os.Getenv("PORT") == "" {
+	if port == "" {
 		port = "8000"
 	}
 

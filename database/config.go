@@ -22,5 +22,5 @@ func Connect() {
 	}
 	log.Println("Database connected...")
 
-	DB.AutoMigrate(&models.User{}, &models.Claims{})
+	DB.AutoMigrate(&models.User{}, &models.Claims{}, &models.File{}, &models.Folder{})
 }
