@@ -37,7 +37,7 @@ email: string,
 password: string
 }
 
-File endpoints:
+# File endpoints: prefixed with **/drive**
 
 ## Store a file: /upload/file
 
@@ -46,11 +46,11 @@ body: {
 file: Formdata
 }
 
-## Get a file: /download/file/{fileName}
+## Download a file: /download/file/{fileName}
 
 **GET**
 
-## Get all files: /download/files
+## Get all files a user has stored: /files
 
 **GET**
 
@@ -60,7 +60,7 @@ file: Formdata
 
 Folder endpoints:
 
-## Create a folder: /folder
+## Create a folder: /create-folder
 
 **POST**
 body: {

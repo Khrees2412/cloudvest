@@ -162,14 +162,32 @@ func DeleteFile(c *fiber.Ctx) error {
 	user_id := fmt.Sprintf("%s", c.Locals("id"))
 
 	file := &models.File{}
-	db.DB.Where("uuid = ? AND name = ?", user_id, file_name).Delete(&file)
+	err := db.DB.Where("uuid = ? AND name = ?", user_id, file_name).Delete(&file)
+	if err != nil {
+		return c.JSON(
+			fiber.Map{
+				"error":   true,
+				"message": "File couldn't be downloaded",
+			})
+	}
 	return c.JSON(fiber.Map{
-		"message": fmt.Sprintf("Delete %s successfully", file_name),
+		"message": fmt.Sprintf("Deleted %s successfully", file_name),
 	})
 
 }
 
 func DownloadFile(c *fiber.Ctx) error {
-	file := c.Params("file")
-	return c.JSON(file)
+	file_name := c.Params("filename")
+	user_id := fmt.Sprintf("%s", c.Locals("id"))
+	file := &models.File{}
+	err := db.DB.Where("uuid = ? AND name = ?", user_id, file_name).First(&file)
+	if err != nil {
+		return c.JSON(
+			fiber.Map{
+				"error":   true,
+				"message": "File couldn't be downloaded",
+			})
+	}
+	f := file.Url
+	return c.Download(f)
 }
