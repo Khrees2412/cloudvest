@@ -1,3 +1,4 @@
+[WIP]
 Risevest Cloud Drive
 
 This application safely and securely stores your file in the cloud.
@@ -7,7 +8,7 @@ Stack:
 -   language: Go
 -   Web framework: Fiber
 -   Cloud storage: AWS S3
--   Database:
+-   Database: PostgreSQL
 
 # How to run
 
