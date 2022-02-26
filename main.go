@@ -1,7 +1,6 @@
 package main
 
 import (
-	// "risevest/database"
 	"risevest/database"
 	"risevest/logger"
 	"risevest/routes"
@@ -29,7 +28,6 @@ func init() {
 	editor := envs["AWS_ACCESS_KEY"]
 
 	log.Println("Environment variables ", name, editor)
-	// log.Println(os.Environ())
 	// loads values from .env into the system
 	if err := godotenv.Load(); err != nil {
 		log.Fatalln("No .env file found")

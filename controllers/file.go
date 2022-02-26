@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"fmt"
-	"os"
 
 	db "risevest/database"
 	"risevest/models"
@@ -10,13 +9,6 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	log "github.com/sirupsen/logrus"
-)
-
-var (
-	AWS_S3_REGION  = os.Getenv("AWS_REGION")
-	AWS_S3_BUCKET  = os.Getenv("AWS_BUCKET")
-	AWS_ACCESS_KEY = os.Getenv("AWS_ACCESS_KEY")
-	AWS_SECRET_KEY = os.Getenv("AWS_SECRET_KEY")
 )
 
 // kb 204800
@@ -31,8 +23,6 @@ func StoreFileInFolder(c *fiber.Ctx) error {
 				"error": "You must specify a folder",
 			})
 	}
-
-	fmt.Println("aws: ", AWS_ACCESS_KEY)
 
 	user := &models.User{}
 	db.DB.Where("uuid = ?", user_id).First(&user)
@@ -86,7 +76,6 @@ func StoreFileInFolder(c *fiber.Ctx) error {
 }
 func StoreFile(c *fiber.Ctx) error {
 	user_id := fmt.Sprintf("%s", c.Locals("id"))
-	fmt.Println("aws: ", AWS_ACCESS_KEY)
 
 	user := &models.User{}
 	db.DB.Where("uuid = ?", user_id).First(&user)
