@@ -4,8 +4,8 @@ import (
 	"os"
 	"time"
 
-	db "risevest/database"
-	"risevest/models"
+	db "cloudvest/database"
+	"cloudvest/models"
 
 	valid "github.com/asaskevich/govalidator"
 	"github.com/gofiber/fiber/v2"

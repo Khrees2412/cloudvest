@@ -17,7 +17,7 @@ Stack:
 -   Go compiler (download at https://golang.org)
 -   Docker
 
-Base Endpoint: https://risevest.herokuapp.com/api/v1
+Base Endpoint: https://cloudvest.herokuapp.com/api/v1
 
 Auth endpoints:
 
@@ -40,14 +40,14 @@ password: string
 
 # File endpoints: prefixed with **/drive**
 
-## Store a file: /upload/file
+## Store a file: /upload
 
 **POST**
 body: {
 file: Formdata
 }
 
-## Download a file: /download/file/{fileName}
+## Download a file: /download/{fileName}
 
 **GET**
 
@@ -55,7 +55,7 @@ file: Formdata
 
 **GET**
 
-## Delete a file: /file/{fileName}
+## Delete a file: /{fileName}
 
 **DELETE**
 
@@ -68,7 +68,7 @@ body: {
 name: string
 }
 
-## Store a file in a folder: /upload/folder/{folderName}/file
+## Store a file in a folder: /upload/{folderName}
 
 **POST**
 body: {

@@ -1,9 +1,9 @@
 package main
 
 import (
-	"risevest/database"
-	"risevest/logger"
-	"risevest/routes"
+	"cloudvest/database"
+	"cloudvest/logger"
+	"cloudvest/routes"
 
 	"log"
 	"os"

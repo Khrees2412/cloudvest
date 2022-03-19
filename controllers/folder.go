@@ -3,8 +3,8 @@ package controllers
 import (
 	"fmt"
 
-	db "risevest/database"
-	"risevest/models"
+	db "cloudvest/database"
+	"cloudvest/models"
 
 	"github.com/gofiber/fiber/v2"
 	log "github.com/sirupsen/logrus"
@@ -24,6 +24,7 @@ func CreateFolder(c *fiber.Ctx) error {
 		})
 	}
 	folder.UserID = user_id
+
 	db.DB.Create(&folder)
 
 	return c.JSON(fiber.Map{

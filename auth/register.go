@@ -3,10 +3,10 @@ package auth
 import (
 	"math/rand"
 
-	db "risevest/database"
-	"risevest/models"
+	db "cloudvest/database"
+	"cloudvest/models"
 
-	"risevest/utils"
+	"cloudvest/utils"
 
 	"github.com/gofiber/fiber/v2"
 	log "github.com/sirupsen/logrus"

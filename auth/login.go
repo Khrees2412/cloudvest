@@ -3,9 +3,9 @@ package auth
 import (
 	// "fmt"
 
-	db "risevest/database"
-	"risevest/models"
-	"risevest/utils"
+	db "cloudvest/database"
+	"cloudvest/models"
+	"cloudvest/utils"
 
 	"github.com/gofiber/fiber/v2"
 	log "github.com/sirupsen/logrus"

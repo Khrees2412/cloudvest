@@ -10,11 +10,9 @@ import (
 
 type User struct {
 	Base
-	Name     string    `json:"name" gorm:"unique"`
-	Email    string    `json:"email" gorm:"unique"`
-	Password string    `json:"-"`
-	Folder   []*Folder `json:"folders"`
-	File     []*File   `json:"files"`
+	Name     string `json:"name" gorm:"unique"`
+	Email    string `json:"email" gorm:"unique"`
+	Password string `json:"-"`
 }
 
 // UserErrors represent the error format for user routes

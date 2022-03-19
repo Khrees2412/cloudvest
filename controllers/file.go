@@ -3,9 +3,9 @@ package controllers
 import (
 	"fmt"
 
-	db "risevest/database"
-	"risevest/models"
-	"risevest/utils"
+	db "cloudvest/database"
+	"cloudvest/models"
+	"cloudvest/utils"
 
 	"github.com/gofiber/fiber/v2"
 	log "github.com/sirupsen/logrus"
@@ -23,9 +23,6 @@ func StoreFileInFolder(c *fiber.Ctx) error {
 				"error": "You must specify a folder",
 			})
 	}
-
-	user := &models.User{}
-	db.DB.Where("uuid = ?", user_id).First(&user)
 
 	folder := &models.Folder{}
 	db.DB.Where("user_id = ?", user_id).First(&folder)
@@ -66,8 +63,11 @@ func StoreFileInFolder(c *fiber.Ctx) error {
 	new_file.Name = filename
 	new_file.Url = data.Location
 	new_file.UserID = user_id
+	new_file.FolderID = f
 
-	folder.Files = append(folder.Files, *new_file)
+	// folder.Files = append(folder.Files, *new_file)
+	// db.DB.Save(folder)
+	db.DB.Create(&new_file)
 
 	return c.JSON(fiber.Map{
 		"message":  fmt.Sprintf("successfully uploaded %s", filename),
@@ -76,9 +76,6 @@ func StoreFileInFolder(c *fiber.Ctx) error {
 }
 func StoreFile(c *fiber.Ctx) error {
 	user_id := fmt.Sprintf("%s", c.Locals("id"))
-
-	user := &models.User{}
-	db.DB.Where("uuid = ?", user_id).First(&user)
 
 	file, err := c.FormFile("file")
 	if err != nil {
@@ -110,6 +107,8 @@ func StoreFile(c *fiber.Ctx) error {
 	new_file.Url = data.Location
 	new_file.UserID = user_id
 
+	db.DB.Create(&new_file)
+
 	return c.JSON(fiber.Map{
 		"message":  fmt.Sprintf("successfully uploaded %s", filename),
 		"file_url": data.Location,
@@ -117,27 +116,33 @@ func StoreFile(c *fiber.Ctx) error {
 }
 func GetFiles(c *fiber.Ctx) error {
 	user_id := fmt.Sprintf("%s", c.Locals("id"))
-	user := &models.User{}
+	files := &models.File{}
 
-	db.DB.Where("uuid = ?", user_id).Find(&user.File)
-	if len(user.File) < 1 {
+	err := db.DB.Where("uuid = ?", user_id).Find(&files)
+	if err != nil {
 		return c.JSON(fiber.Map{
 			"message": "No files found for user",
 		})
 	}
 	return c.JSON(fiber.Map{
 		"message": "Successfully retrieved files",
-		"files":   user.File,
+		"files":   files,
 	})
 
 }
 
 func GetFile(c *fiber.Ctx) error {
-	file_name := fmt.Sprintf("%s", c.Locals("filename"))
+	file_name := c.Params("filename")
 	user_id := fmt.Sprintf("%s", c.Locals("id"))
 
 	file := &models.File{}
-	db.DB.Where("uuid = ? AND name = ?", user_id, file_name).Find(&file)
+	err := db.DB.Where("uuid = ? AND name = ?", user_id, file_name).Find(&file)
+	if err != nil {
+		return c.JSON(fiber.Map{
+			"error":   true,
+			"message": "File couldn't be found",
+		})
+	}
 	return c.JSON(fiber.Map{
 		"success": true,
 		"message": "File found",
@@ -147,7 +152,7 @@ func GetFile(c *fiber.Ctx) error {
 }
 
 func DeleteFile(c *fiber.Ctx) error {
-	file_name := fmt.Sprintf("%s", c.Locals("filename"))
+	file_name := c.Params("filename")
 	user_id := fmt.Sprintf("%s", c.Locals("id"))
 
 	file := &models.File{}
@@ -156,7 +161,7 @@ func DeleteFile(c *fiber.Ctx) error {
 		return c.JSON(
 			fiber.Map{
 				"error":   true,
-				"message": "File couldn't be downloaded",
+				"message": "File couldn't be deleted",
 			})
 	}
 	return c.JSON(fiber.Map{

@@ -1,8 +1,8 @@
 package auth
 
 import (
-	db "risevest/database"
-	"risevest/models"
+	db "cloudvest/database"
+	"cloudvest/models"
 
 	"github.com/gofiber/fiber/v2"
 )

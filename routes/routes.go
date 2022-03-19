@@ -1,9 +1,9 @@
 package routes
 
 import (
-	"risevest/auth"
-	"risevest/controllers"
-	"risevest/utils"
+	"cloudvest/auth"
+	"cloudvest/controllers"
+	"cloudvest/utils"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -22,7 +22,7 @@ func Setup(app *fiber.App) {
 
 	private.Post("/create-folder", controllers.CreateFolder)
 
-	private.Post("/upload/folder/:folder", controllers.StoreFileInFolder)
+	private.Post("/upload/:folder", controllers.StoreFileInFolder)
 
 	private.Post("/upload", controllers.StoreFile)
 
