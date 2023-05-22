@@ -32,3 +32,6 @@
 
 //     return s3err
 }
+
+// AwsS3Region  = os.Getenv("AWS_REGION")
+// AwsS3Bucket  = os.Getenv("AWS_BUCKET")

@@ -1,5 +1,5 @@
 [WIP]
-Risevest Cloud Drive
+Cloudvest - A simple google-drive-like tool 
 
 This application safely and securely stores your file in the cloud.
 

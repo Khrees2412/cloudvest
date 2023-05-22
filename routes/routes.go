@@ -13,10 +13,10 @@ func Setup(app *fiber.App) {
 	// Base Api end point
 	api := app.Group("/api/v1")
 	// Authentication end points
-	_auth := api.Group("/auth")
+	a := api.Group("/auth")
 	private := api.Group("/drive")
-	_auth.Post("/login", auth.Login)
-	_auth.Post("/register", auth.Register)
+	a.Post("/login", auth.Login)
+	a.Post("/register", auth.Register)
 
 	private.Use(utils.SecureAuth())
 

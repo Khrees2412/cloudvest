@@ -13,14 +13,17 @@ import (
 var DB *gorm.DB
 
 func Connect() {
-	DB_URI := os.Getenv("DB_URI")
+	databaseUrl := os.Getenv("DATABASE_URL")
 	var err error
-	DB, err = gorm.Open(postgres.Open(DB_URI), &gorm.Config{})
+	DB, err = gorm.Open(postgres.Open(databaseUrl), &gorm.Config{})
 
 	if err != nil {
 		panic("could not connect to the database")
 	}
 	log.Println("Database connected...")
 
-	DB.AutoMigrate(&models.User{}, &models.Claims{}, &models.File{}, &models.Folder{})
+	err = DB.AutoMigrate(models.User{}, models.Folder{}, models.File{})
+	if err != nil {
+		log.Info("Unable to perform migration")
+	}
 }

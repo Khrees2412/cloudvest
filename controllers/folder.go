@@ -11,24 +11,28 @@ import (
 )
 
 func CreateFolder(c *fiber.Ctx) error {
-
 	folder := new(models.Folder)
-
-	user_id := fmt.Sprintf("%s", c.Locals("id"))
+	userId := fmt.Sprintf("%s", c.Locals("id"))
 
 	if err := c.BodyParser(folder); err != nil {
 		log.Error(err)
-		return c.JSON(fiber.Map{
-			"success": false,
-			"message": "Please review your input data",
+		return c.JSON(GenericResponse{
+			Success: false,
+			Message: "Please review your input data",
 		})
 	}
-	folder.UserID = user_id
+	folder.UserID = userId
 
-	db.DB.Create(&folder)
+	if err := db.DB.Create(&folder).Error; err != nil {
+		return c.JSON(GenericResponse{
+			Success: false,
+			Message: "Unable to create folder",
+			Data:    err.Error(),
+		})
+	}
 
-	return c.JSON(fiber.Map{
-		"success": true,
-		"message": fmt.Sprintf("New folder created %s", folder.Name),
+	return c.JSON(GenericResponse{
+		Success: true,
+		Message: fmt.Sprintf("New folder created %s", folder.Name),
 	})
 }

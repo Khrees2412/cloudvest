@@ -1,25 +1,26 @@
 package logger
 
 import (
-	"os"
+	"fmt"
+	"runtime"
+	"strings"
 
-	log "github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 )
 
-func SetupLogger() {
-	log.SetFormatter(&log.JSONFormatter{})
-
-	file, err := os.OpenFile("logs.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
-	if err != nil {
-		log.Fatal(err)
+func init() {
+	logrus.SetReportCaller(true)
+	formatter := &logrus.TextFormatter{
+		TimestampFormat:        "02-01-2006 15:04:05",
+		FullTimestamp:          true,
+		DisableLevelTruncation: true,
+		CallerPrettyfier: func(f *runtime.Frame) (string, string) {
+			return "", fmt.Sprintf("%s:%d", formatFilePath(f.File), f.Line)
+		},
 	}
-
-	log.Println("Logger setup!")
-
-	log.SetOutput(file)
-
-	defer file.Close()
-
-	// log.SetLevel(log.WarnLevel)
-
+	logrus.SetFormatter(formatter)
+}
+func formatFilePath(path string) string {
+	arr := strings.Split(path, "/")
+	return arr[len(arr)-1]
 }

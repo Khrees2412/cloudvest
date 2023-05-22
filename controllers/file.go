@@ -14,173 +14,193 @@ import (
 // kb 204800
 var maxByteSize = 209700000 // 200 MB
 
+type GenericResponse struct {
+	Success bool        `json:"success"`
+	Message string      `json:"message"`
+	Data    interface{} `json:"data"`
+}
+
 func StoreFileInFolder(c *fiber.Ctx) error {
-	user_id := fmt.Sprintf("%s", c.Locals("id"))
-	f := c.Params("folder")
-	if f == "" {
-		return c.JSON(
-			fiber.Map{
-				"error": "You must specify a folder",
-			})
+	userId := fmt.Sprintf("%s", c.Locals("id"))
+	folderId := c.Params("folder")
+	if folderId == "" {
+		return c.JSON(GenericResponse{
+			Success: false,
+			Message: "You must specify a folder",
+		})
 	}
 
-	folder := &models.Folder{}
-	db.DB.Where("user_id = ?", user_id).First(&folder)
-
-	if folder.Name != f {
-		return c.JSON(fiber.Map{
-			"message": "folder does not exist, you need to create a folder"})
+	var folder models.Folder
+	if err := db.DB.Where("user_id = ? AND id = ?", userId, folderId).First(&folder).Error; err != nil {
+		return c.JSON(GenericResponse{
+			Success: false,
+			Message: "folder does not exist, you need to create a folder",
+		})
 	}
 
 	file, err := c.FormFile("file")
 	if err != nil {
 		log.Error(err)
-		return c.JSON(
-			fiber.Map{
-				"error": "Invalid file",
-			})
+		return c.JSON(GenericResponse{
+			Success: false,
+			Message: "invalid file",
+		})
 	}
 	filesize := file.Size
 	filename := file.Filename
 	if filesize > int64(maxByteSize) {
-		return c.JSON(
-			fiber.Map{
-				"error": "The file size is too large, try something below 200mb",
-			})
+		return c.JSON(GenericResponse{
+			Success: false,
+			Message: "The file size is too large, try something below 200mb",
+		})
 	}
-	data, uploaderr := utils.UploadFile(file)
+	data, err := utils.UploadFile(file)
 
-	if uploaderr != nil {
-		fmt.Println(uploaderr)
-
-		return c.JSON(
-			fiber.Map{
-				"message": "File upload failed",
-				"error":   uploaderr,
-			})
+	if err != nil {
+		return c.JSON(GenericResponse{
+			Success: false,
+			Message: "File upload failed",
+			Data:    err.Error(),
+		})
 	}
-	new_file := &models.File{}
-	new_file.Name = filename
-	new_file.Url = data.Location
-	new_file.UserID = user_id
-	new_file.FolderID = f
 
-	// folder.Files = append(folder.Files, *new_file)
-	// db.DB.Save(folder)
-	db.DB.Create(&new_file)
+	newFile := models.File{
+		Name:     filename,
+		UserID:   userId,
+		Url:      data.Location,
+		FolderID: folderId,
+	}
 
-	return c.JSON(fiber.Map{
-		"message":  fmt.Sprintf("successfully uploaded %s", filename),
-		"file_url": data.Location,
+	if err = db.DB.Create(&newFile).Error; err != nil {
+		return c.JSON(GenericResponse{
+			Success: false,
+			Message: "File upload failed",
+		})
+	}
+
+	return c.JSON(GenericResponse{
+		Success: true,
+		Message: fmt.Sprintf("successfully uploaded %s", filename),
+		Data:    data.Location,
 	})
 }
 func StoreFile(c *fiber.Ctx) error {
-	user_id := fmt.Sprintf("%s", c.Locals("id"))
+	userId := fmt.Sprintf("%s", c.Locals("id"))
 
 	file, err := c.FormFile("file")
 	if err != nil {
 		log.Error(err)
-		return c.JSON(
-			fiber.Map{
-				"error": "Invalid file",
-			})
+		return c.JSON(GenericResponse{
+			Success: false,
+			Message: "Invalid file",
+			Data:    err.Error(),
+		})
 	}
 	filesize := file.Size
 	filename := file.Filename
 	if filesize > int64(maxByteSize) {
-		return c.JSON(
-			fiber.Map{
-				"error": "The file size is too large, try something below 200mb",
-			})
-	}
-	data, uploaderr := utils.UploadFile(file)
-
-	if uploaderr != nil {
-		fmt.Println(uploaderr)
-		return c.JSON(fiber.Map{
-			"error":   uploaderr,
-			"message": "File upload failed",
+		return c.JSON(GenericResponse{
+			Success: false,
+			Message: "The file size is too large, try something below 200mb",
 		})
 	}
-	new_file := &models.File{}
-	new_file.Name = filename
-	new_file.Url = data.Location
-	new_file.UserID = user_id
+	data, err := utils.UploadFile(file)
 
-	db.DB.Create(&new_file)
+	if err != nil {
+		log.Println(err)
+		return c.JSON(GenericResponse{
+			Success: false,
+			Message: "File upload failed",
+		})
+	}
 
-	return c.JSON(fiber.Map{
-		"message":  fmt.Sprintf("successfully uploaded %s", filename),
-		"file_url": data.Location,
+	newFile := models.File{
+		Name:   filename,
+		UserID: userId,
+		Url:    data.Location,
+	}
+
+	if err = db.DB.Create(&newFile).Error; err != nil {
+		return c.JSON(GenericResponse{
+			Success: false,
+			Message: "File upload failed",
+		})
+	}
+
+	return c.JSON(GenericResponse{
+		Success: true,
+		Message: fmt.Sprintf("successfully uploaded %s", filename),
+		Data:    data.Location,
 	})
 }
 func GetFiles(c *fiber.Ctx) error {
-	user_id := fmt.Sprintf("%s", c.Locals("id"))
-	files := &models.File{}
+	userId := fmt.Sprintf("%s", c.Locals("id"))
+	var files []models.File
 
-	err := db.DB.Where("uuid = ?", user_id).Find(&files)
+	err := db.DB.Where("id = ?", userId).Find(&files).Error
 	if err != nil {
-		return c.JSON(fiber.Map{
-			"message": "No files found for user",
+		return c.JSON(GenericResponse{
+			Success: false,
+			Message: "Unable to find files for user",
 		})
 	}
-	return c.JSON(fiber.Map{
-		"message": "Successfully retrieved files",
-		"files":   files,
+	return c.JSON(GenericResponse{
+		Success: true,
+		Message: "Successfully retrieved files",
+		Data:    files,
 	})
 
 }
 
 func GetFile(c *fiber.Ctx) error {
-	file_name := c.Params("filename")
-	user_id := fmt.Sprintf("%s", c.Locals("id"))
+	fileName := c.Params("filename")
+	userId := fmt.Sprintf("%s", c.Locals("id"))
 
-	file := &models.File{}
-	err := db.DB.Where("uuid = ? AND name = ?", user_id, file_name).Find(&file)
+	var file models.File
+	err := db.DB.Where("id = ? AND name = ?", userId, fileName).Find(&file).Error
 	if err != nil {
-		return c.JSON(fiber.Map{
-			"error":   true,
-			"message": "File couldn't be found",
+		return c.JSON(GenericResponse{
+			Success: false,
+			Message: "File not found",
 		})
 	}
-	return c.JSON(fiber.Map{
-		"success": true,
-		"message": "File found",
-		"file":    file,
+	return c.JSON(GenericResponse{
+		Success: true,
+		Message: "File successfully retrieved",
+		Data:    file,
 	})
 
 }
 
 func DeleteFile(c *fiber.Ctx) error {
-	file_name := c.Params("filename")
-	user_id := fmt.Sprintf("%s", c.Locals("id"))
+	fileName := c.Params("filename")
+	userId := fmt.Sprintf("%s", c.Locals("id"))
 
-	file := &models.File{}
-	err := db.DB.Where("uuid = ? AND name = ?", user_id, file_name).Delete(&file)
+	var file models.File
+	err := db.DB.Where("id = ? AND name = ?", userId, fileName).Delete(&file).Error
 	if err != nil {
-		return c.JSON(
-			fiber.Map{
-				"error":   true,
-				"message": "File couldn't be deleted",
-			})
+		return c.JSON(GenericResponse{
+			Success: false,
+			Message: "File couldn't be deleted",
+		})
 	}
-	return c.JSON(fiber.Map{
-		"message": fmt.Sprintf("Deleted %s successfully", file_name),
+	return c.JSON(GenericResponse{
+		Success: true,
+		Message: fmt.Sprintf("Deleted %s successfully", fileName),
 	})
 
 }
 
 func DownloadFile(c *fiber.Ctx) error {
-	file_name := c.Params("filename")
-	user_id := fmt.Sprintf("%s", c.Locals("id"))
-	file := &models.File{}
-	err := db.DB.Where("uuid = ? AND name = ?", user_id, file_name).First(&file)
+	fileName := c.Params("filename")
+	userId := fmt.Sprintf("%s", c.Locals("id"))
+	var file models.File
+	err := db.DB.Where("id = ? AND name = ?", userId, fileName).First(&file).Error
 	if err != nil {
-		return c.JSON(
-			fiber.Map{
-				"error":   true,
-				"message": "File couldn't be downloaded",
-			})
+		return c.JSON(GenericResponse{
+			Success: false,
+			Message: "File couldn't be downloaded",
+		})
 	}
 	f := file.Url
 	return c.Download(f)

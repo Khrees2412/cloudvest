@@ -2,10 +2,9 @@ package main
 
 import (
 	"cloudvest/database"
-	"cloudvest/logger"
 	"cloudvest/routes"
+	"github.com/sirupsen/logrus"
 
-	"log"
 	"os"
 
 	"github.com/gofiber/fiber/v2"
@@ -14,25 +13,11 @@ import (
 )
 
 func init() {
-
-	// set up logger
-	logger.SetupLogger()
-	var envs map[string]string
-	envs, err := godotenv.Read(".env")
-
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
-
-	name := envs["AWS_BUCKET"]
-	editor := envs["AWS_ACCESS_KEY"]
-
-	log.Println("Environment variables ", name, editor)
 	// loads values from .env into the system
 	if err := godotenv.Load(); err != nil {
-		log.Fatalln("No .env file found")
+		logrus.Println("No .env file found")
 	}
-	log.Println("Environment variables successfully loaded. Starting application...")
+	logrus.Println("Environment variables successfully loaded. Starting application...")
 }
 
 func main() {
@@ -45,7 +30,7 @@ func main() {
 	routes.Setup(app)
 
 	app.Get("/", func(c *fiber.Ctx) error {
-		return c.SendString("You're home, yaay!!")
+		return c.SendString("Cloudvest app set")
 	})
 	//Activate CORS
 	app.Use(cors.New(cors.Config{
@@ -59,12 +44,14 @@ func main() {
 	// Get the PORT from heroku env
 	port := os.Getenv("PORT")
 
-	// Verify if heroku provided the port or not
 	if port == "" {
 		port = "8000"
 	}
 
-	app.Listen(":" + port)
+	err := app.Listen(":" + port)
+	if err != nil {
+		panic(err)
+	}
 	// log.Fatal("app started on port:", port)
 
 }

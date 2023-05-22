@@ -25,7 +25,7 @@ type UserErrors struct {
 
 // Claims represent the structure of the JWT token
 type Claims struct {
-	jwt.StandardClaims
+	jwt.RegisteredClaims
 	ID uint `gorm:"primaryKey"`
 }
 
@@ -36,16 +36,15 @@ func GenerateISOString() string {
 
 // Base contains common columns for all tables
 type Base struct {
-	ID        uint      `gorm:"primaryKey"`
-	UUID      uuid.UUID `json:"_id" gorm:"primaryKey;autoIncrement:false"`
-	CreatedAt string    `json:"created_at"`
-	UpdatedAt string    `json:"updated_at"`
+	ID        string `gorm:"primaryKey" json:"id"`
+	CreatedAt string `json:"created_at"`
+	UpdatedAt string `json:"updated_at"`
 }
 
 // BeforeCreate will set Base struct before every insert
 func (base *Base) BeforeCreate(tx *gorm.DB) error {
 	// uuid.New() creates a new random UUID or panics.
-	base.UUID = uuid.New()
+	base.ID = uuid.NewString()
 
 	// generate timestamps
 	t := GenerateISOString()
